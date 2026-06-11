@@ -1,6 +1,6 @@
 # Swiftbase TypeScript Admin SDK
 
-A robust, type-safe TypeScript Admin SDK for integrating customer backend services with the Swiftbase platform. Supports service authentication, role & service management, customer management, configurations, real-time database querying, and object storage.
+TypeScript Admin SDK for integrating customer backend services with the Swiftbase platform. Supports service authentication, role & service management, configurations, real-time database querying, and object storage.
 
 ## Installation
 
