@@ -20,6 +20,7 @@ export interface Configuration {
   brand_name: string;
   brand_logo_url?: string;
   primary_color: string;
+  redirect_uris?: string[];
   created_at: string;
   updated_at: string;
 }

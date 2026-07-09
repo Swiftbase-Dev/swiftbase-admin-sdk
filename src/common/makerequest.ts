@@ -128,7 +128,17 @@ export const makeRequest = async (
   }
 
   // Construct url
-  let url = path.startsWith("http") ? path : `${app.baseUrl}${!path.startsWith("/") ? "/" : ""}${path}`;
+  let base = app.baseUrl || "https://api.swiftbase.io";
+  if (!base.includes("localhost") && !base.includes("127.0.0.1")) {
+    if (path.includes("/db/") || path.includes("/database") || path.includes("/tables") || path.includes("/sql") || path.includes("/queries")) {
+      base = base.replace("api.swiftbase", "database.swiftbase");
+    } else if (path.includes("/oauth2") || path.includes("/login") || path.includes("/api/roles") || path.includes("/api/services") || path.includes("/api/users") || path.includes("/api/me")) {
+      base = base.replace("api.swiftbase", "identity.swiftbase");
+    } else {
+      base = base.replace("api.swiftbase", "app.swiftbase");
+    }
+  }
+  let url = path.startsWith("http") ? path : `${base}${!path.startsWith("/") ? "/" : ""}${path}`;
   
   // Append query params if provided
   if (params) {
@@ -154,7 +164,30 @@ export const makeRequest = async (
   try {
     const response = await fetch(url, options);
     if (!response.ok) {
-      handleRequestError(response.status);
+      let message = "";
+      try {
+        const bodyText = await response.text();
+        try {
+          const parsed = JSON.parse(bodyText);
+          message = parsed.message || parsed.error || bodyText;
+        } catch {
+          message = bodyText;
+        }
+      } catch (_) {}
+      
+      const errorMsg = message ? `HTTP ${response.status}: ${message}` : `HTTP error ${response.status}`;
+      console.error(errorMsg);
+      if (response.status === 401) {
+        throw new Unauthorized(errorMsg);
+      } else if (response.status === 403) {
+        throw new Forbidden(errorMsg);
+      } else if (response.status === 400) {
+        throw new BadRequest(errorMsg);
+      } else if (response.status === 429) {
+        throw new TooManyRequests(errorMsg);
+      } else {
+        throw new Error(errorMsg);
+      }
     }
     const data = await response.json();
     

@@ -2,7 +2,7 @@ import { makeRequest, HTTPMethod, PaginatedResponse } from "../common/makereques
 import type { 
   Role, RoleInput, RoleUpdateInput,
   Service, ServiceInput, ServiceUpdateInput,
-  User
+  User, UserInput
 } from "./types";
 
 /**
@@ -96,4 +96,9 @@ export const unassignRole = async (userId: string, roleName: string): Promise<Us
   const user = await makeRequest(HTTPMethod.GET, `/api/users/${userId}`);
   const roles = (user.roles || []).filter((r: string) => r !== roleName);
   return await makeRequest(HTTPMethod.PUT, `/api/users/${userId}`, undefined, { roles });
+};
+
+// Create a new user
+export const createUser = async (input: UserInput): Promise<User> => {
+  return await makeRequest(HTTPMethod.POST, "/api/users", undefined, input);
 };

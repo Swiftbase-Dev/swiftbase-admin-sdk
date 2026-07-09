@@ -50,3 +50,12 @@ export interface User {
   approved?: boolean;
   attributes?: any;
 }
+
+export interface UserInput {
+  email: string;
+  password?: string;
+  projectId: string;
+  firstName?: string;
+  lastName?: string;
+  approved?: boolean;
+}

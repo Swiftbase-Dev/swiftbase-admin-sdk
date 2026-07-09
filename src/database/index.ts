@@ -32,7 +32,7 @@ export class DatabaseSocketManager {
   }
 
   public isWebSocketAvailable(): boolean {
-    return this.socket !== null && (this.socket.readyState === 0 || this.socket.readyState === 1);
+    return this.socket !== null && this.socket.readyState === 1;
   }
 
   private getWebSocketUrl(baseUrl: string, token: string | null): string {
@@ -329,16 +329,6 @@ export class QueryBuilder implements PromiseLike<any> {
   }
 
   async execute(): Promise<{ data: any[]; columns: string[]; count: number }> {
-    const socketManager = DatabaseSocketManager.getInstance();
-
-    if (socketManager.isWebSocketAvailable()) {
-      try {
-        return await socketManager.executeQuery(this.payload);
-      } catch (err) {
-        console.warn("[QueryBuilder] WebSocket execution failed, falling back to REST:", err);
-      }
-    }
-
     return await makeRequest(HTTPMethod.POST, "/api/db/query", undefined, this.payload);
   }
 
@@ -350,8 +340,109 @@ export class QueryBuilder implements PromiseLike<any> {
   }
 }
 
+export interface TableDefinition {
+  dbname: string;
+  name: string;
+  ddl: string;
+}
+
 export function db(dbName: string) {
-  return function (tableName: string) {
+  const dbClient = function (tableName: string) {
     return new QueryBuilder(dbName, tableName);
   };
+
+  dbClient.initializeDatabase = async function (tables: TableDefinition[]): Promise<void> {
+    const projectId = app.projectId;
+    let dbs: any[] = [];
+    try {
+      dbs = await makeRequest(HTTPMethod.GET, "/api/databases", { projectId });
+    } catch (err: any) {
+      console.error("[DatabaseInit] Failed to list databases:", err.message);
+      throw err;
+    }
+
+    let myDb = dbs.find((d: any) => d.name === dbName);
+    if (!myDb) {
+      console.log(`[DatabaseInit] Database '${dbName}' not found. Creating...`);
+      try {
+        myDb = await makeRequest(HTTPMethod.POST, "/api/databases", undefined, {
+          name: dbName,
+          projectId,
+          engine: "oltp",
+          enableGraphQL: true
+        });
+      } catch (err: any) {
+        console.error("[DatabaseInit] Failed to create database:", err.message);
+        throw err;
+      }
+    }
+
+    const databaseId = myDb.id;
+    const schemaName = dbName.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+
+    try {
+      await makeRequest(HTTPMethod.POST, "/api/sql", undefined, {
+        databaseId,
+        sql: `CREATE SCHEMA IF NOT EXISTS "${schemaName}"`
+      });
+    } catch (err: any) {
+      console.error("[DatabaseInit] Failed to create schema:", err.message);
+      throw err;
+    }
+
+    let existingTables: any[] = [];
+    try {
+      existingTables = await makeRequest(HTTPMethod.GET, "/api/tables", { databaseId });
+    } catch (err: any) {
+      console.error("[DatabaseInit] Failed to list tables:", err.message);
+      throw err;
+    }
+
+    for (const t of tables) {
+      try {
+        await makeRequest(HTTPMethod.POST, "/api/sql", undefined, {
+          databaseId,
+          sql: t.ddl
+        });
+      } catch (err: any) {
+        console.error(`[DatabaseInit] Failed to execute DDL for table ${t.dbname}:`, err.message);
+        throw err;
+      }
+
+      const metaExists = existingTables.some((meta: any) => meta.dbname === t.dbname);
+      if (!metaExists) {
+        try {
+          await makeRequest(HTTPMethod.POST, "/api/tables", undefined, {
+            databaseId,
+            dbname: t.dbname,
+            name: t.name,
+            docName: t.dbname,
+            rules: "true"
+          });
+        } catch (err: any) {
+          console.error(`[DatabaseInit] Failed to register metadata for table ${t.dbname}:`, err.message);
+          throw err;
+        }
+      }
+    }
+  };
+
+  dbClient.executeSQL = async function (sql: string): Promise<any> {
+    const projectId = app.projectId;
+    let dbs: any[] = [];
+    try {
+      dbs = await makeRequest(HTTPMethod.GET, "/api/databases", { projectId });
+    } catch (err: any) {
+      console.error("[DatabaseSQL] Failed to list databases:", err.message);
+      throw err;
+    }
+    const myDb = dbs.find((d: any) => d.name === dbName);
+    if (!myDb) throw new Error(`Database ${dbName} not found`);
+    return await makeRequest(HTTPMethod.POST, "/api/sql", undefined, {
+      databaseId: myDb.id,
+      sql
+    });
+  };
+
+  return dbClient;
 }

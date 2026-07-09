@@ -12,7 +12,11 @@ import { Service } from "../identity/types";
  */
 export const verifyServiceToken = async (token: string, scope?: string): Promise<Service> => {
   // Use the internal verify-service-token endpoint
-  const url = `${app.baseUrl}/api/verify-service-token`;
+  let base = app.baseUrl || "https://api.swiftbase.io";
+  if (!base.includes("localhost") && !base.includes("127.0.0.1")) {
+    base = base.replace("api.swiftbase", "identity.swiftbase");
+  }
+  const url = `${base}/api/verify-service-token`;
   
   const response = await fetch(url, {
     method: "POST",

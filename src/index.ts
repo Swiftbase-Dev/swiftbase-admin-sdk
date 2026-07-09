@@ -13,6 +13,7 @@ import {
   updateService,
   deleteService,
   getUsers,
+  createUser,
   assignRole,
   unassignRole,
 } from "./identity";
@@ -24,14 +25,19 @@ import type {
   ServiceInput,
   ServiceUpdateInput,
   User as IdentityUser,
+  UserInput,
 } from "./identity/types";
 import { getProfile, updateProfile, updateUser, changePassword } from "./profile";
 import type { Profile, ProfileInput, ChangePasswordInput } from "./profile";
 import { getConfiguration, updateConfiguration } from "./config";
 import type { Configuration, ConfigurationInput } from "./config/types";
 import { db } from "./database";
+import { search } from "./database/search";
+import type { TableDefinition } from "./database";
 import { Storage } from "./storage/storage";
 import type { StorageOptions, BucketInfo, S3Object, ListObjectsResult } from "./storage/storage";
+import { ai } from "./ai";
+import type { AIChatMessage, AIChatCompletionOptions, AIChatCompletionResponse } from "./ai";
 
 export {
   app,
@@ -52,6 +58,7 @@ export {
   updateService,
   deleteService,
   getUsers,
+  createUser,
   assignRole,
   unassignRole,
   getAccessToken,
@@ -63,6 +70,8 @@ export {
   updateConfiguration,
   db,
   Storage,
+  ai,
+  search,
 };
 export type {
   User,
@@ -73,6 +82,7 @@ export type {
   ServiceInput,
   ServiceUpdateInput,
   IdentityUser,
+  UserInput,
   Profile,
   ProfileInput,
   ChangePasswordInput,
@@ -82,4 +92,8 @@ export type {
   BucketInfo,
   S3Object,
   ListObjectsResult,
+  AIChatMessage,
+  AIChatCompletionOptions,
+  AIChatCompletionResponse,
+  TableDefinition,
 };
