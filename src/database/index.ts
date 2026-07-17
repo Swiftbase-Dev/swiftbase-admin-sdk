@@ -380,15 +380,7 @@ export function db(dbName: string) {
     const databaseId = myDb.id;
     const schemaName = dbName.toLowerCase().replace(/[^a-z0-9_]/g, '_');
 
-    try {
-      await makeRequest(HTTPMethod.POST, "/api/sql", undefined, {
-        databaseId,
-        sql: `CREATE SCHEMA IF NOT EXISTS "${schemaName}"`
-      });
-    } catch (err: any) {
-      console.error("[DatabaseInit] Failed to create schema:", err.message);
-      throw err;
-    }
+
 
     let existingTables: any[] = [];
     try {
