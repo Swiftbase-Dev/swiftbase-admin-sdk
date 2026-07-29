@@ -33,10 +33,7 @@ export interface ListObjectsResult {
 
 function getDefaultEndpoint(): string {
   const base = app.baseUrl || "https://api.swiftbase.io";
-  if (base.includes("localhost") || base.includes("127.0.0.1")) {
-    return "http://localhost:3006";
-  }
-  return base.replace("api.swiftbase", "storage.swiftbase");
+  return base + "/storage";
 }
 
 function parseListBuckets(xml: string): BucketInfo[] {

@@ -129,15 +129,6 @@ export const makeRequest = async (
 
   // Construct url
   let base = app.baseUrl || "https://api.swiftbase.io";
-  if (!base.includes("localhost") && !base.includes("127.0.0.1")) {
-    if (path.includes("/db/") || path.includes("/database") || path.includes("/tables") || path.includes("/sql") || path.includes("/queries")) {
-      base = base.replace("api.swiftbase", "database.swiftbase");
-    } else if (path.includes("/oauth2") || path.includes("/login") || path.includes("/api/roles") || path.includes("/api/services") || path.includes("/api/users") || path.includes("/api/me")) {
-      base = base.replace("api.swiftbase", "identity.swiftbase");
-    } else {
-      base = base.replace("api.swiftbase", "app.swiftbase");
-    }
-  }
   let url = path.startsWith("http") ? path : `${base}${!path.startsWith("/") ? "/" : ""}${path}`;
   
   // Append query params if provided

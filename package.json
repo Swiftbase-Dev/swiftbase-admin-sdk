@@ -1,6 +1,6 @@
 {
   "name": "swiftbase-admin-sdk",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "TypeScript Admin SDK for integrating customer backend services with Swiftbase",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

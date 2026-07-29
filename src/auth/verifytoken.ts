@@ -23,9 +23,6 @@ export const verifyToken = async (token: string): Promise<User> => {
   };
 
   let base = app.baseUrl || "https://api.swiftbase.io";
-  if (!base.includes("localhost") && !base.includes("127.0.0.1")) {
-    base = base.replace("api.swiftbase", "identity.swiftbase");
-  }
   const response = await fetch(`${base}/api/me`, { headers });
   if (!response.ok) {
     throw new Error(`Token verification failed: ${response.status}`);

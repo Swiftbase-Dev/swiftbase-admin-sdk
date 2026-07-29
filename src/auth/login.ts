@@ -18,9 +18,6 @@ export const login = async (serviceId: string, secretKey: string): Promise<void>
   body.append("scope", "openid profile email");
 
   let base = app.baseUrl || "https://api.swiftbase.io";
-  if (!base.includes("localhost") && !base.includes("127.0.0.1")) {
-    base = base.replace("api.swiftbase", "identity.swiftbase");
-  }
   const url = `${base}/oauth2/token`;
   
   const response = await fetch(url, {
