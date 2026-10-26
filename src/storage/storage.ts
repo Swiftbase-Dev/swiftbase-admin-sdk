@@ -53,14 +53,42 @@ function parseListBuckets(xml: string): BucketInfo[] {
   return buckets;
 }
 
-function parseListObjects(xml: string): ListObjectsResult {
-  const nameMatch = xml.match(/<Name>(.*?)<\/Name>/);
-  const prefixMatch = xml.match(/<Prefix>(.*?)<\/Prefix>/);
-  const maxKeysMatch = xml.match(/<MaxKeys>(.*?)<\/MaxKeys>/);
-  const isTruncatedMatch = xml.match(/<IsTruncated>(.*?)<\/IsTruncated>/);
+function parseListObjects(text: string): ListObjectsResult {
+  const trimmed = text.trim();
+  if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      const items = Array.isArray(parsed) ? parsed : (parsed.contents || []);
+      const contents: S3Object[] = items.map((item: any) => {
+        const pathPrefix = item.path && item.path !== "/" ? item.path.replace(/\/$/, "") + "/" : "";
+        const key = item.key || (item.name ? `${pathPrefix}${item.name}` : "");
+        return {
+          key,
+          lastModified: item.modified || item.lastModified,
+          etag: item.etag,
+          size: item.size || 0
+        };
+      });
+      return {
+        name: "",
+        prefix: "",
+        maxKeys: contents.length,
+        isTruncated: false,
+        contents,
+        commonPrefixes: []
+      };
+    } catch (e) {
+      // Fall back to XML parsing
+    }
+  }
+
+  const nameMatch = text.match(/<Name>(.*?)<\/Name>/);
+  const prefixMatch = text.match(/<Prefix>(.*?)<\/Prefix>/);
+  const maxKeysMatch = text.match(/<MaxKeys>(.*?)<\/MaxKeys>/);
+  const isTruncatedMatch = text.match(/<IsTruncated>(.*?)<\/IsTruncated>/);
 
   const contents: S3Object[] = [];
-  const contentMatches = xml.matchAll(/<Contents>([\s\S]*?)<\/Contents>/g);
+  const contentMatches = text.matchAll(/<Contents>([\s\S]*?)<\/Contents>/g);
   for (const match of contentMatches) {
     const content = match[1];
     const keyMatch = content.match(/<Key>(.*?)<\/Key>/);
@@ -79,19 +107,19 @@ function parseListObjects(xml: string): ListObjectsResult {
   }
 
   const commonPrefixes: string[] = [];
-  const cpMatches = xml.matchAll(/<CommonPrefixes>([\s\S]*?)<\/CommonPrefixes>/g);
+  const cpMatches = text.matchAll(/<CommonPrefixes>([\s\S]*?)<\/CommonPrefixes>/g);
   for (const match of cpMatches) {
-    const prefixMatch = match[1].match(/<Prefix>(.*?)<\/Prefix>/);
-    if (prefixMatch) {
-      commonPrefixes.push(prefixMatch[1]);
+    const pMatch = match[1].match(/<Prefix>(.*?)<\/Prefix>/);
+    if (pMatch) {
+      commonPrefixes.push(pMatch[1]);
     }
   }
 
   return {
-    name: nameMatch ? nameMatch[1] : '',
-    prefix: prefixMatch ? prefixMatch[1] : '',
+    name: nameMatch ? nameMatch[1] : "",
+    prefix: prefixMatch ? prefixMatch[1] : "",
     maxKeys: maxKeysMatch ? parseInt(maxKeysMatch[1]) : 1000,
-    isTruncated: isTruncatedMatch ? isTruncatedMatch[1] === 'true' : false,
+    isTruncated: isTruncatedMatch ? isTruncatedMatch[1] === "true" : false,
     contents,
     commonPrefixes
   };

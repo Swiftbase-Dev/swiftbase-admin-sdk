@@ -31,9 +31,9 @@ import { getProfile, updateProfile, updateUser, changePassword } from "./profile
 import type { Profile, ProfileInput, ChangePasswordInput } from "./profile";
 import { getConfiguration, updateConfiguration } from "./config";
 import type { Configuration, ConfigurationInput } from "./config/types";
-import { db } from "./database";
+import { db, QueryBuilder } from "./database";
 import { search } from "./database/search";
-import type { TableDefinition } from "./database";
+import type { TableDefinition, BatchQueryResult } from "./database";
 import { Storage } from "./storage/storage";
 import type { StorageOptions, BucketInfo, S3Object, ListObjectsResult } from "./storage/storage";
 import { ai } from "./ai";
@@ -69,6 +69,7 @@ export {
   getConfiguration,
   updateConfiguration,
   db,
+  QueryBuilder,
   Storage,
   ai,
   search,
@@ -96,4 +97,5 @@ export type {
   AIChatCompletionOptions,
   AIChatCompletionResponse,
   TableDefinition,
+  BatchQueryResult,
 };
