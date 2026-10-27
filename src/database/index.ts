@@ -517,36 +517,37 @@ export function db(dbName: string) {
     }
   };
 
-  dbClient.executeSQL = async function (sql: string): Promise<any> {
+  let cachedDatabaseId: string | null = null;
+  const getResolvedDbId = async (): Promise<string> => {
+    if (cachedDatabaseId) return cachedDatabaseId;
     const projectId = app.projectId;
-    let dbs: any[] = [];
     try {
-      dbs = await makeRequest(HTTPMethod.GET, "/api/databases", { projectId });
+      const dbs: any[] = await makeRequest(HTTPMethod.GET, "/api/databases", { projectId });
+      const myDb = dbs.find((d: any) => d.name === dbName || d.id === dbName);
+      if (myDb) {
+        cachedDatabaseId = myDb.id;
+        return myDb.id;
+      }
     } catch (err: any) {
-      console.error("[DatabaseSQL] Failed to list databases:", err.message);
-      throw err;
+      console.warn("[DatabaseSQL] Failed to resolve database ID from list, using dbName:", err.message);
     }
-    const myDb = dbs.find((d: any) => d.name === dbName);
-    if (!myDb) throw new Error(`Database ${dbName} not found`);
+    return dbName;
+  };
+
+  dbClient.executeSQL = async function (sql: string): Promise<any> {
+    const databaseId = await getResolvedDbId();
     return await makeRequest(HTTPMethod.POST, "/api/sql", undefined, {
-      databaseId: myDb.id,
+      databaseId,
+      database: dbName,
       sql
     });
   };
 
   dbClient.executeBatchSQL = async function (sqlStatements: string[] | string): Promise<BatchQueryResult[]> {
-    const projectId = app.projectId;
-    let dbs: any[] = [];
-    try {
-      dbs = await makeRequest(HTTPMethod.GET, "/api/databases", { projectId });
-    } catch (err: any) {
-      console.error("[DatabaseSQL] Failed to list databases:", err.message);
-      throw err;
-    }
-    const myDb = dbs.find((d: any) => d.name === dbName);
-    if (!myDb) throw new Error(`Database ${dbName} not found`);
-
-    const payload = typeof sqlStatements === "string" ? { databaseId: myDb.id, sql: sqlStatements } : { databaseId: myDb.id, batch: sqlStatements };
+    const databaseId = await getResolvedDbId();
+    const payload = typeof sqlStatements === "string" 
+      ? { databaseId, database: dbName, sql: sqlStatements } 
+      : { databaseId, database: dbName, batch: sqlStatements };
     const res = await makeRequest(HTTPMethod.POST, "/api/sql", undefined, payload);
     if (res && res.isBatch && Array.isArray(res.results)) {
       return res.results;

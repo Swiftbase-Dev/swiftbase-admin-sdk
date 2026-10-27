@@ -114,6 +114,7 @@ export const makeRequest = async (
   // Check for valid access token if needed (some routes might be public)
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    "Connection": "keep-alive",
   };
 
   // Automatically get token if missing/expired
@@ -146,6 +147,7 @@ export const makeRequest = async (
   const options: RequestInit = {
     method,
     headers,
+    keepalive: true,
   };
 
   if (body) {
