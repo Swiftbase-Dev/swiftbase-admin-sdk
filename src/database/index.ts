@@ -1,7 +1,7 @@
 import { app } from "../common/app";
 import { getAccessToken } from "../auth";
 import { makeRequest, HTTPMethod } from "../common/makerequest";
-import { v4 as uuidv4 } from "uuid";
+import { generateId } from "../common/id";
 
 export interface QueryPayload {
   database: string;
@@ -123,7 +123,7 @@ export class DatabaseSocketManager {
     if (!this.socket || this.socket.readyState !== 1) {
       throw new Error("WebSocket not open");
     }
-    const id = uuidv4();
+    const id = generateId();
     this.socket.send(JSON.stringify({
       id,
       action: "listen",
@@ -167,7 +167,7 @@ export class DatabaseSocketManager {
 
   public async executeQuery(payload: QueryPayload): Promise<any> {
     await this.ensureConnected();
-    const id = uuidv4();
+    const id = generateId();
     this.socket.send(JSON.stringify({
       id,
       action: "query",
@@ -372,6 +372,20 @@ export class QueryBuilder implements PromiseLike<any> {
   ): Promise<TResult1 | TResult2> {
     return this.execute().then(onfulfilled, onrejected);
   }
+
+  /**
+   * Generates a sequential, lowercase, 26-character time-sortable database ID (monotonic ULID).
+   */
+  generateId(): string {
+    return generateId();
+  }
+
+  /**
+   * Alias for generateId().
+   */
+  id(): string {
+    return generateId();
+  }
 }
 
 export interface TableDefinition {
@@ -390,10 +404,34 @@ export interface BatchQueryResult {
   executionTimeMs?: number;
 }
 
-export function db(dbName: string) {
-  const dbClient = function (tableName: string) {
-    return new QueryBuilder(dbName, tableName);
-  };
+export interface DbClient {
+  (tableName: string): QueryBuilder;
+  generateId: () => string;
+  id: () => string;
+  batch: (queries: Array<QueryBuilder | string>) => Promise<BatchQueryResult[]>;
+  executeBatch: (sqlStatements: string[]) => Promise<BatchQueryResult[]>;
+  init: (tables: TableDefinition[]) => Promise<void>;
+  executeSQL: (sql: string) => Promise<any>;
+  executeBatchSQL: (sqlStatements: string[] | string) => Promise<BatchQueryResult[]>;
+}
+
+export interface DbInterface {
+  (dbName: string): DbClient;
+  generateId: () => string;
+  id: () => string;
+}
+
+export const db: DbInterface = Object.assign(
+  function (dbName: string): DbClient {
+    const dbClient = function (tableName: string) {
+      return new QueryBuilder(dbName, tableName);
+    } as any;
+
+    /**
+     * Generates a sequential, lowercase, 26-character time-sortable database ID (monotonic ULID).
+     */
+    dbClient.generateId = generateId;
+    dbClient.id = generateId;
 
   /**
    * Execute multiple QueryBuilder instances or raw SQL queries in a single atomic batch request
@@ -555,5 +593,12 @@ export function db(dbName: string) {
     return [res];
   };
 
-  return dbClient;
-}
+    return dbClient as DbClient;
+  },
+  {
+    generateId,
+    id: generateId
+  }
+);
+
+export { generateId };

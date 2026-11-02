@@ -1,6 +1,6 @@
 {
   "name": "swiftbase-admin-sdk",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "TypeScript Admin SDK for integrating customer backend services with Swiftbase",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -42,6 +42,7 @@
   "dependencies": {
     "showdown": "^2.1.0",
     "socket.io-client": "^4.7.5",
+    "ulid": "^3.0.2",
     "uuid": "^11.0.5"
   }
 }

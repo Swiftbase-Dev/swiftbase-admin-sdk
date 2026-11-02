@@ -38,9 +38,6 @@ export default class Token {
    * @returns {boolean} True if the API key is valid, false otherwise
    */
   isValid() {
-    if (this.#expiration === 0) {
-      return true;
-    }
     return this.#expiration > Date.now();
   }
 
