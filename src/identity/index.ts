@@ -77,12 +77,6 @@ export const getUsers = async (projectId: string): Promise<User[]> => {
 
 // Assign a role to a user
 export const assignRole = async (userId: string, roleName: string): Promise<User> => {
-  // We use the standard PUT update for now, fetching current roles first if needed, 
-  // but simpler is to have the backend handle it.
-  // For now, I'll assume PUT /api/users/:id handles partial updates or I'll add the specific logic.
-  
-  // Actually, I'll check if I should add /api/users/:id/roles in auth service.
-  // Given the request, I'll just use the standard update for now.
   const user = await makeRequest(HTTPMethod.GET, `/api/users/${userId}`);
   const roles = [...(user.roles || [])];
   if (!roles.includes(roleName)) {
@@ -101,4 +95,15 @@ export const unassignRole = async (userId: string, roleName: string): Promise<Us
 // Create a new user
 export const createUser = async (input: UserInput): Promise<User> => {
   return await makeRequest(HTTPMethod.POST, "/api/users", undefined, input);
+};
+
+// Update an existing user
+export const updateUser = async (id: string, input: Partial<UserInput> & { roles?: string[]; attributes?: Record<string, any> }): Promise<User> => {
+  return await makeRequest(HTTPMethod.PUT, `/api/users/${id}`, undefined, input);
+};
+
+// Delete a user
+export const deleteUser = async (id: string): Promise<string> => {
+  await makeRequest(HTTPMethod.DELETE, `/api/users/${id}`);
+  return id;
 };

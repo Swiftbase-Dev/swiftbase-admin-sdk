@@ -1,5 +1,4 @@
 import { app, setAccessToken } from "../common/app";
-import { makeRequest, HTTPMethod } from "../common/makerequest";
 
 /**
  * Login as a service

@@ -71,16 +71,24 @@ describe("Profile", () => {
   });
 
   it("should change user password", async () => {
-    vi.spyOn(makeRequestModule, "makeRequest").mockResolvedValue({ success: true });
+    vi.spyOn(makeRequestModule, "makeRequest")
+      .mockResolvedValueOnce({ id: "my-user-id" })
+      .mockResolvedValueOnce({ success: true });
     const input: ChangePasswordInput = { currentPassword: "old", newPassword: "new" };
 
     const result = await changePassword(input);
     expect(result).toEqual({ success: true });
-    expect(makeRequestModule.makeRequest).toHaveBeenCalledWith(
-      makeRequestModule.HTTPMethod.POST,
-      "/api/users/change-password",
+    expect(makeRequestModule.makeRequest).toHaveBeenNthCalledWith(
+      1,
+      makeRequestModule.HTTPMethod.GET,
+      "/api/me"
+    );
+    expect(makeRequestModule.makeRequest).toHaveBeenNthCalledWith(
+      2,
+      makeRequestModule.HTTPMethod.PUT,
+      "/api/users/my-user-id",
       undefined,
-      input
+      { password: "new", currentPassword: "old" }
     );
   });
 });

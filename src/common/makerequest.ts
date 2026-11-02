@@ -168,8 +168,7 @@ export const makeRequest = async (
         }
       } catch (_) {}
       
-      const errorMsg = message ? `HTTP ${response.status}: ${message}` : `HTTP error ${response.status}`;
-      console.error(errorMsg);
+      const errorMsg = message ? message : `HTTP error ${response.status}`;
       if (response.status === 401) {
         throw new Unauthorized(errorMsg);
       } else if (response.status === 403) {
@@ -191,7 +190,6 @@ export const makeRequest = async (
       return data;
     }
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };

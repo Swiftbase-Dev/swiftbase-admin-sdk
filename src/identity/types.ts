@@ -48,7 +48,7 @@ export interface User {
   projectId?: string;
   roles?: string[];
   approved?: boolean;
-  attributes?: any;
+  attributes?: Record<string, any>;
 }
 
 export interface UserInput {

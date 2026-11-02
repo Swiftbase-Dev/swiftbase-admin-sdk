@@ -124,4 +124,10 @@ describe("Database Query Builder", () => {
       })
     );
   });
+
+  it("should have init method bound to initializeDatabase", () => {
+    const client = db("my_db");
+    expect(typeof client.init).toBe("function");
+    expect(client.init).toBe(client.initializeDatabase);
+  });
 });

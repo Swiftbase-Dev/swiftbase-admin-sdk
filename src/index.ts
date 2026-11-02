@@ -14,6 +14,8 @@ import {
   deleteService,
   getUsers,
   createUser,
+  updateUser as updateIdentityUser,
+  deleteUser,
   assignRole,
   unassignRole,
 } from "./identity";
@@ -37,7 +39,13 @@ import type { TableDefinition, BatchQueryResult, DbClient, DbInterface } from ".
 import { Storage } from "./storage/storage";
 import type { StorageOptions, BucketInfo, S3Object, ListObjectsResult } from "./storage/storage";
 import { ai } from "./ai";
-import type { AIChatMessage, AIChatCompletionOptions, AIChatCompletionResponse } from "./ai";
+import type {
+  AIChatMessage,
+  AIChatCompletionOptions,
+  AIChatCompletionResponse,
+  AIPromptRunOptions,
+  AIPromptRunResponse,
+} from "./ai";
 
 export {
   app,
@@ -60,6 +68,7 @@ export {
   deleteService,
   getUsers,
   createUser,
+  deleteUser,
   assignRole,
   unassignRole,
   getAccessToken,
@@ -97,6 +106,8 @@ export type {
   AIChatMessage,
   AIChatCompletionOptions,
   AIChatCompletionResponse,
+  AIPromptRunOptions,
+  AIPromptRunResponse,
   TableDefinition,
   BatchQueryResult,
   DbClient,

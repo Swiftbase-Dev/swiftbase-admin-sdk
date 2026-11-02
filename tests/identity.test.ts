@@ -9,6 +9,8 @@ import {
   updateService,
   deleteService,
   getUsers,
+  createUser,
+  deleteUser,
   assignRole,
   unassignRole,
 } from "../src/identity";
@@ -197,6 +199,17 @@ describe("Identity", () => {
       "/api/users/user-1",
       undefined,
       { roles: ["Viewer"] }
+    );
+  });
+
+  it("should delete a user", async () => {
+    vi.spyOn(makeRequestModule, "makeRequest").mockResolvedValue({});
+
+    const id = await deleteUser("user-1");
+    expect(id).toBe("user-1");
+    expect(makeRequestModule.makeRequest).toHaveBeenCalledWith(
+      makeRequestModule.HTTPMethod.DELETE,
+      "/api/users/user-1"
     );
   });
 });

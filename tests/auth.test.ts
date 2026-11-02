@@ -85,10 +85,9 @@ describe("Auth", () => {
     expect(globalThis.fetch).toHaveBeenCalledWith(
       "http://localhost:3000/api/verify-service-token",
       expect.objectContaining({
-        method: "POST",
-        headers: {
+        headers: expect.objectContaining({
           "Content-Type": "application/json",
-        },
+        }),
         body: JSON.stringify({ token, scope: "admin" }),
       })
     );

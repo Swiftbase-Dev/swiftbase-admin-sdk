@@ -11,21 +11,8 @@ import { Service } from "../identity/types";
  * @returns {Promise<Service>} The service associated with the token
  */
 export const verifyServiceToken = async (token: string, scope?: string): Promise<Service> => {
-  // Use the internal verify-service-token endpoint
-  let base = app.baseUrl || "https://api.swiftbase.io";
-  const url = `${base}/api/verify-service-token`;
-  
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ token, scope })
+  return await makeRequest(HTTPMethod.POST, "/api/verify-service-token", undefined, {
+    token,
+    scope
   });
-
-  if (!response.ok) {
-    throw new Error(`Service token verification failed: ${response.status}`);
-  }
-
-  return await response.json();
 };

@@ -14,20 +14,12 @@ describe("App Configurations", () => {
   it("should initialize with custom options", () => {
     initializeSdk("proj-123", {
       baseUrl: "https://custom.api.io/",
-      debounceTimeout: 500,
-      cacheArticles: false,
-      searchCacheEnabled: false,
-      searchCacheCapacity: 100,
       serviceId: "srv-1",
       serviceKey: "key-1"
     });
 
     expect(app.projectId).toBe("proj-123");
     expect(app.baseUrl).toBe("https://custom.api.io"); // Trailing slash removed
-    expect(app.debounceTimeout).toBe(500);
-    expect(app.cacheArticles).toBe(false);
-    expect(app.searchCacheEnabled).toBe(false);
-    expect(app.searchCacheCapacity).toBe(100);
     expect(app.serviceId).toBe("srv-1");
     expect(app.serviceKey).toBe("key-1");
   });

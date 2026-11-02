@@ -554,6 +554,7 @@ export const db: DbInterface = Object.assign(
       }
     }
   };
+  dbClient.init = dbClient.initializeDatabase;
 
   let cachedDatabaseId: string | null = null;
   const getResolvedDbId = async (): Promise<string> => {
