@@ -88,6 +88,14 @@ import type {
   AIPromptRunOptions,
   AIPromptRunResponse,
 } from "./ai";
+import { vault } from "./vault";
+import type {
+  VaultSecret,
+  VaultVersion,
+  VaultLog,
+  CreateSecretInput,
+  UpdateSecretInput,
+} from "./vault";
 
 export {
   app,
@@ -141,6 +149,7 @@ export {
   MigrationRunner,
   Storage,
   ai,
+  vault,
   search,
 };
 export type {
@@ -158,6 +167,11 @@ export type {
   ChangePasswordInput,
   Configuration,
   ConfigurationInput,
+  VaultSecret,
+  VaultVersion,
+  VaultLog,
+  CreateSecretInput,
+  UpdateSecretInput,
   StorageOptions,
   BucketInfo,
   S3Object,
