@@ -12,6 +12,9 @@ export interface StorageOptions {
 
 export interface BucketInfo {
   name: string;
+  id?: string;
+  region?: string;
+  cdnEnabled?: boolean;
   creationDate?: string;
 }
 
@@ -36,9 +39,26 @@ function getDefaultEndpoint(): string {
   return base + "/storage";
 }
 
-function parseListBuckets(xml: string): BucketInfo[] {
+function parseListBuckets(text: string): BucketInfo[] {
+  const trimmed = text.trim();
+  if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      const items = Array.isArray(parsed) ? parsed : (parsed.data || parsed.buckets || []);
+      return items.map((item: any) => ({
+        name: item.name || item.id,
+        id: item.id,
+        region: item.region,
+        cdnEnabled: Boolean(item.cdnEnabled),
+        creationDate: item.createdAt || item.creationDate || item.created_at
+      }));
+    } catch (e) {
+      // Fall back to XML parsing
+    }
+  }
+
   const buckets: BucketInfo[] = [];
-  const bucketMatches = xml.matchAll(/<Bucket>([\s\S]*?)<\/Bucket>/g);
+  const bucketMatches = text.matchAll(/<Bucket>([\s\S]*?)<\/Bucket>/g);
   for (const match of bucketMatches) {
     const bucketContent = match[1];
     const nameMatch = bucketContent.match(/<Name>(.*?)<\/Name>/);
@@ -172,6 +192,10 @@ export class Storage {
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
+    }
+
+    if (app.projectId) {
+      headers["x-project-id"] = app.projectId;
     }
     return headers;
   }

@@ -1,5 +1,5 @@
 {
-  "name": "swiftbase-admin-sdk",
+  "name": "@swiftbaseio/admin-sdk",
   "version": "1.1.0",
   "description": "TypeScript Admin SDK for integrating customer backend services with Swiftbase",
   "main": "./dist/index.js",

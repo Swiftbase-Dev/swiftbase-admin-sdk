@@ -8,6 +8,7 @@
 
 import { makeRequest, HTTPMethod } from "../../common/makerequest";
 import { generateId } from "../../common/id";
+import { app } from "../../common/app";
 import { DatabaseSocketManager } from "../socket";
 import { SQLCompiler } from "./compiler";
 import {
@@ -36,6 +37,7 @@ export class QueryBuilder implements PromiseLike<any> {
     this.payload = {
       database: this.dbName,
       table: this.tableName,
+      projectId: app.projectId || undefined,
     };
   }
 

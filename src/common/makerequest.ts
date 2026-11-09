@@ -128,6 +128,10 @@ export const makeRequest = async (
     headers["Authorization"] = `Bearer ${app.accessToken.value()}`;
   }
 
+  if (app.projectId) {
+    headers["x-project-id"] = app.projectId;
+  }
+
   // Construct url
   let base = app.baseUrl || "https://api.swiftbase.io";
   let url = path.startsWith("http") ? path : `${base}${!path.startsWith("/") ? "/" : ""}${path}`;

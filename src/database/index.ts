@@ -84,6 +84,7 @@ export const db: DbInterface = Object.assign(
       const res = await makeRequest(HTTPMethod.POST, "/api/sql", undefined, {
         database: dbName,
         databaseId: dbName,
+        projectId: app.projectId,
         batch: statementsOrQueries,
       });
 
@@ -100,6 +101,7 @@ export const db: DbInterface = Object.assign(
       const res = await makeRequest(HTTPMethod.POST, "/api/sql", undefined, {
         database: dbName,
         databaseId: dbName,
+        projectId: app.projectId,
         batch: sqlStatements,
       });
 
@@ -116,6 +118,7 @@ export const db: DbInterface = Object.assign(
       return await makeRequest(HTTPMethod.POST, "/api/sql", undefined, {
         database: dbName,
         databaseId: dbName,
+        projectId: app.projectId,
         sql,
       });
     };
@@ -128,8 +131,8 @@ export const db: DbInterface = Object.assign(
     ): Promise<BatchQueryResult[]> {
       const payload =
         typeof sqlStatements === "string"
-          ? { database: dbName, databaseId: dbName, sql: sqlStatements }
-          : { database: dbName, databaseId: dbName, batch: sqlStatements };
+          ? { database: dbName, databaseId: dbName, projectId: app.projectId, sql: sqlStatements }
+          : { database: dbName, databaseId: dbName, projectId: app.projectId, batch: sqlStatements };
       const res = await makeRequest(HTTPMethod.POST, "/api/sql", undefined, payload);
       if (res && res.isBatch && Array.isArray(res.results)) {
         return res.results;

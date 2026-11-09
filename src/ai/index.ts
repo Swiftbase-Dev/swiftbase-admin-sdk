@@ -33,6 +33,8 @@ export interface AIChatCompletionOptions {
   tool_choice?: any;
   temperature?: number;
   max_tokens?: number;
+  bypass_guardrails?: boolean;
+  bypassGuardrails?: boolean;
 }
 
 export interface AIChatCompletionResponse {
@@ -90,6 +92,8 @@ export const ai = {
           tool_choice: options.tool_choice,
           temperature: options.temperature,
           max_tokens: options.max_tokens,
+          bypass_guardrails: options.bypass_guardrails ?? options.bypassGuardrails,
+          bypassGuardrails: options.bypassGuardrails ?? options.bypass_guardrails,
         });
       }
     }

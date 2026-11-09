@@ -7,7 +7,7 @@ TypeScript Admin SDK for integrating customer backend services with the Swiftbas
 Install the package via npm:
 
 ```bash
-npm install swiftbase-admin-sdk
+npm install @swiftbaseio/admin-sdk
 ```
 
 ---
@@ -19,7 +19,7 @@ npm install swiftbase-admin-sdk
 Initialize the SDK at the entry point of your application using your Project ID:
 
 ```typescript
-import { initializeSdk } from "swiftbase-admin-sdk";
+import { initializeSdk } from "@swiftbaseio/admin-sdk";
 
 initializeSdk("your-project-id");
 ```
@@ -35,7 +35,7 @@ The Admin SDK supports authenticating backend services, managing access tokens, 
 Log in as a backend service using a Service ID and Secret Key:
 
 ```typescript
-import { login } from "swiftbase-admin-sdk";
+import { login } from "@swiftbaseio/admin-sdk";
 
 await login("your-service-id", "your-service-secret");
 ```
@@ -45,7 +45,7 @@ await login("your-service-id", "your-service-secret");
 Verify a user token or service token in custom middleware:
 
 ```typescript
-import { verifyToken, verifyServiceToken } from "swiftbase-admin-sdk";
+import { verifyToken, verifyServiceToken } from "@swiftbaseio/admin-sdk";
 
 // Verify a user access token
 const user = await verifyToken("user-jwt-token");
@@ -57,7 +57,7 @@ const service = await verifyServiceToken("service-jwt-token", "admin");
 ### Session Helper Methods
 
 ```typescript
-import { isLoggedIn, logout, getAccessToken } from "swiftbase-admin-sdk";
+import { isLoggedIn, logout, getAccessToken } from "@swiftbaseio/admin-sdk";
 
 if (isLoggedIn()) {
   const token = await getAccessToken();
@@ -76,7 +76,7 @@ Manage roles, services, and user role assignments.
 ### Role Management
 
 ```typescript
-import { getRoles, createRole, updateRole, deleteRole } from "swiftbase-admin-sdk";
+import { getRoles, createRole, updateRole, deleteRole } from "@swiftbaseio/admin-sdk";
 
 // Get roles
 const roles = await getRoles("your-project-id");
@@ -101,7 +101,7 @@ await deleteRole("role-id");
 ### Service Management
 
 ```typescript
-import { getServices, createService, updateService, deleteService } from "swiftbase-admin-sdk";
+import { getServices, createService, updateService, deleteService } from "@swiftbaseio/admin-sdk";
 
 // Get services
 const services = await getServices("your-project-id");
@@ -127,7 +127,7 @@ await deleteService("service-id");
 ### User Role Assignments
 
 ```typescript
-import { getUsers, assignRole, unassignRole } from "swiftbase-admin-sdk";
+import { getUsers, assignRole, unassignRole } from "@swiftbaseio/admin-sdk";
 
 // List all project users
 const users = await getUsers("your-project-id");
@@ -146,7 +146,7 @@ await unassignRole("user-id", "Manager");
 Query your Swiftbase databases using the Query Builder. Query execution automatically utilizes WebSockets if available, otherwise it transparently falls back to REST.
 
 ```typescript
-import { db } from "swiftbase-admin-sdk";
+import { db } from "@swiftbaseio/admin-sdk";
 
 // Fetch rows
 const users = await db("my_database")("users")
@@ -190,7 +190,7 @@ unsubscribe();
 Interface with storage buckets using the S3-compatible client.
 
 ```typescript
-import { Storage } from "swiftbase-admin-sdk";
+import { Storage } from "@swiftbaseio/admin-sdk";
 
 const storage = new Storage({
   bucket: "my-bucket",

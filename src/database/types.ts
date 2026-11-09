@@ -60,6 +60,7 @@ export interface AggregateClause {
 export interface QueryPayload {
   database: string;
   table: string;
+  projectId?: string;
   select?: string[];
   distinct?: boolean;
   where?: WhereCondition[];
