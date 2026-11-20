@@ -56,6 +56,7 @@ import {
   MigrationRunner,
 } from "./database";
 import { search } from "./database/search";
+import { stacks } from "./stacks";
 import type {
   BatchQueryResult,
   DbClient,
@@ -201,4 +202,5 @@ export type {
   MigrationPlan,
   MigrationResult,
   ExistingTableCatalog,
+  stacks,
 };
