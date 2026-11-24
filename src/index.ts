@@ -1,5 +1,11 @@
 import { app, initializeSdk, isLoggedIn, logout, setAccessToken } from "./common/app";
 import { PaginatedResponse } from "./common/makerequest";
+import {
+  customScope,
+  getScopes,
+  createCustomScope,
+  deleteCustomScope,
+} from "./identity/scopes";
 import { login, verifyToken, verifyServiceToken, getAccessToken } from "./auth";
 import type { User } from "./auth";
 
@@ -108,6 +114,10 @@ export {
   login,
   verifyToken,
   verifyServiceToken,
+  customScope,
+  getScopes,
+  createCustomScope,
+  deleteCustomScope,
   PaginatedResponse,
   getRoles,
   createRole,

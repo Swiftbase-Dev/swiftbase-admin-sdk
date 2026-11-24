@@ -1,18 +1,36 @@
-import { app } from "../common/app";
 import { makeRequest, HTTPMethod } from "../common/makerequest";
-import { Service } from "../identity/types";
+
+export interface VerifiedServiceToken {
+  valid: boolean;
+  service: {
+    id: string;
+    name: string;
+    projectId: string;
+    scopes: string[];
+  };
+}
+
+export interface VerifyServiceTokenOptions {
+  scope?: string;
+  scopes?: string[];
+  match?: "all" | "any";
+}
 
 /**
- * Verify a service's access token
- *
- * @param {string} token The access token to verify
- * @param {string} [scope] Optional scope to verify
- *
- * @returns {Promise<Service>} The service associated with the token
+ * Verify a service's access token (JWT) against Swiftbase.
+ * Enforces same-project isolation and optional built-in or `custom:*` scope requirements.
  */
-export const verifyServiceToken = async (token: string, scope?: string): Promise<Service> => {
-  return await makeRequest(HTTPMethod.POST, "/api/verify-service-token", undefined, {
-    token,
-    scope
-  });
+export const verifyServiceToken = async (
+  token: string,
+  scopeOrOptions?: string | VerifyServiceTokenOptions
+): Promise<VerifiedServiceToken> => {
+  const body: Record<string, any> = { token };
+  if (typeof scopeOrOptions === "string") {
+    body.scope = scopeOrOptions;
+  } else if (scopeOrOptions && typeof scopeOrOptions === "object") {
+    if (scopeOrOptions.scope) body.scope = scopeOrOptions.scope;
+    if (scopeOrOptions.scopes) body.scopes = scopeOrOptions.scopes;
+    if (scopeOrOptions.match) body.match = scopeOrOptions.match;
+  }
+  return await makeRequest(HTTPMethod.POST, "/api/verify-service-token", undefined, body);
 };

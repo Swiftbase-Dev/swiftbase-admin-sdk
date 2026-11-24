@@ -1,3 +1,4 @@
+export * from "./scopes";
 import { makeRequest, HTTPMethod, PaginatedResponse } from "../common/makerequest";
 import type { 
   Role, RoleInput, RoleUpdateInput,
