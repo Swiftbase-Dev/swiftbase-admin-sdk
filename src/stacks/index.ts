@@ -31,30 +31,30 @@ export interface StackPlanResult {
 }
 
 export const stacks = {
-  async list(projectId?: string) {
+  async list(projectId?: string): Promise<any[]> {
     const pid = projectId || app.projectId;
-    return makeRequest<any[]>(`/api/stacks?projectId=${encodeURIComponent(pid || "")}`, HTTPMethod.GET);
+    return makeRequest(HTTPMethod.GET, "/api/stacks", { projectId: pid || "" });
   },
 
-  async plan(manifest: StackManifest | string, options: { projectId?: string; prune?: boolean } = {}) {
+  async plan(manifest: StackManifest | string, options: { projectId?: string; prune?: boolean } = {}): Promise<StackPlanResult> {
     const pid = options.projectId || app.projectId;
-    return makeRequest<StackPlanResult>("/api/stacks/plan", HTTPMethod.POST, {
+    return makeRequest(HTTPMethod.POST, "/api/stacks/plan", undefined, {
       projectId: pid,
       manifest,
       prune: Boolean(options.prune),
     });
   },
 
-  async apply(manifest: StackManifest | string, options: { projectId?: string; prune?: boolean } = {}) {
+  async apply(manifest: StackManifest | string, options: { projectId?: string; prune?: boolean } = {}): Promise<{ stackId: string; stack: string; deployed: any[] }> {
     const pid = options.projectId || app.projectId;
-    return makeRequest<{ stackId: string; stack: string; deployed: any[] }>("/api/stacks/apply", HTTPMethod.POST, {
+    return makeRequest(HTTPMethod.POST, "/api/stacks/apply", undefined, {
       projectId: pid,
       manifest,
       prune: Boolean(options.prune),
     });
   },
 
-  async down(stackId: string) {
-    return makeRequest<{ success: boolean; removedContainers: number }>(`/api/stacks/${stackId}/down`, HTTPMethod.POST, {});
+  async down(stackId: string): Promise<{ success: boolean; removedContainers: number }> {
+    return makeRequest(HTTPMethod.POST, `/api/stacks/${stackId}/down`, undefined, {});
   },
 };

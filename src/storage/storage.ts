@@ -293,7 +293,7 @@ export class Storage {
     const response = await fetch(url, {
       method,
       headers,
-      body: bodyData
+      body: bodyData as BodyInit
     });
     if (!response.ok) {
       const text = await response.text();
